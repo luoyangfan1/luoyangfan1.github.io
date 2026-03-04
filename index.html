@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌞 太阳影子 · 东左西右（三年级模拟）</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #c1e0ff;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        .experiment-box {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 40px 40px 30px 30px;
+            box-shadow: 0 20px 40px rgba(0, 30, 50, 0.3);
+            padding: 25px 25px 35px 25px;
+            border: 5px solid #f9cb9c;
+        }
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 2.2rem;
+            color: #b45f06;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        h1 span {
+            background: #ffe599;
+            padding: 5px 18px;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            color: #5d3a1a;
+            font-weight: 600;
+        }
+        .sub {
+            color: #0b5394;
+            font-size: 1.3rem;
+            margin: 0 0 15px 0;
+            background: #d0e0f0;
+            padding: 8px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            border: 2px solid #3d85c6;
+        }
+        .canvas-container {
+            background: #b6d7a8;
+            border-radius: 50px;
+            padding: 20px;
+            border: 6px solid #6aa84f;
+            box-shadow: inset 0 0 0 3px #38761d;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #f1f9e7;
+            border-radius: 30px;
+            box-shadow: 0 6px 0 #3c6e1e;
+            cursor: grab;
+            touch-action: none;
+        }
+        .control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 20px;
+            margin: 25px 0 15px;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #ffe599;
+            padding: 12px 18px;
+            border-radius: 50px;
+            border: 3px solid #b45f06;
+        }
+        button {
+            background: #f1c232;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 10px 16px;
+            border-radius: 40px;
+            color: #1f3a3f;
+            border: 2px solid #b45f06;
+            box-shadow: 0 4px 0 #7f4f1a;
+            transition: 0.1s ease;
+            cursor: pointer;
+            min-width: 110px;
+        }
+        button:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        button.mark1 {
+            background: #6fa8dc;
+            color: white;
+            border-color: #073763;
+        }
+        button.mark2 {
+            background: #93c47d;
+            color: white;
+            border-color: #274e13;
+        }
+        button.example-btn {
+            background: #d5a6bd;
+            border-color: #741b47;
+            color: #1a1a1a;
+        }
+        .slider-box {
+            background: #fff2cc;
+            padding: 12px 25px;
+            border-radius: 60px;
+            border: 3px solid #b45f06;
+            flex: 2 1 300px;
+            min-width: 260px;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #5d3a1a;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+        input[type=range] {
+            width: 100%;
+            height: 14px;
+            background: #ffe066;
+            border-radius: 20px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            background: #ffa500;
+            border-radius: 50%;
+            border: 3px solid #b45f06;
+            box-shadow: 0 2px 6px black;
+            cursor: grab;
+        }
+        .info-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: #d9ead3;
+            border-radius: 40px;
+            padding: 20px;
+            border: 4px solid #38761d;
+            margin-top: 15px;
+        }
+        .direction-board {
+            background: white;
+            border-radius: 30px;
+            padding: 15px 20px;
+            flex: 2;
+            min-width: 240px;
+            border: 3px solid #0b5394;
+        }
+        .direction-board p {
+            margin: 8px 0;
+            font-size: 1.2rem;
+        }
+        .compass {
+            background: #ead1dc;
+            border-radius: 30px;
+            padding: 12px 25px;
+            flex: 1;
+            min-width: 180px;
+            border: 3px solid #a64d79;
+            color: #1f1f1f;
+            font-weight: bold;
+        }
+        .compass h3 {
+            margin: 0 0 10px 0;
+            color: #4c1130;
+        }
+        .compass ul {
+            padding-left: 20px;
+            font-size: 1.1rem;
+        }
+        .footnote {
+            background: #fffacd;
+            border-radius: 30px;
+            padding: 15px 20px;
+            margin-top: 20px;
+            border-left: 12px solid #ff8c00;
+            font-size: 1.1rem;
+        }
+        .emph {
+            color: #b45f06;
+            font-weight: bold;
+            background: #fff;
+            padding: 3px 10px;
+            border-radius: 30px;
+        }
+        .big-arrow {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="experiment-box">
+    <h1>
+        🌞 太阳影子侦探 · 东左西右 🌞
+        <span>三年级·模拟实验</span>
+    </h1>
+    <div class="sub">🔦 手电筒模拟太阳 · 影子长短变化+南北垂线</div>
+
+    <div class="canvas-container">
+        <canvas id="skyCanvas" width="800" height="500"></canvas>
+    </div>
+
+    <!-- 控制区域 -->
+    <div class="control-panel">
+        <div class="btn-group">
+            <button class="mark1" id="mark1Btn">📌 记录上午 (1)</button>
+            <button class="mark2" id="mark2Btn">📌 记录下午 (2)</button>
+            <button id="clearBtn">🧽 清除标记</button>
+        </div>
+        <div class="btn-group">
+            <button class="example-btn" id="morningBtn">🌅 移到上午(东·长影)</button>
+            <button class="example-btn" id="noonBtn">☀️ 移到正午(南·短影)</button>
+            <button class="example-btn" id="afternoonBtn">🌇 移到下午(西·长影)</button>
+        </div>
+        <div class="slider-box">
+            <div class="slider-label">
+                <span>🌅 东</span>
+                <span id="sunPosText">太阳 · 东南</span>
+                <span>🌇 西</span>
+            </div>
+            <input type="range" id="sunSlider" min="20" max="160" value="45" step="1">
+        </div>
+    </div>
+
+    <!-- 信息显示 + 问题提示 -->
+    <div class="info-area">
+        <div class="direction-board">
+            <p style="font-size:1.5rem; margin-top:0;">🧭 影子连线 + 南北垂线</p>
+            <p>🔵 标记1 (上午)  <span id="coord1">——</span></p>
+            <p>🟢 标记2 (下午)  <span id="coord2">——</span></p>
+            <p>➡️ <span class="emph">从1 → 2 的方向：</span> <strong id="dir12">等待标记</strong></p>
+            <p>⬆️ <span class="emph">垂直于连线 → 南北方向：</span> <strong id="perpDir">——</strong></p>
+            <p style="color:#073763;">⭐ 早上影子在西（长），中午影子在北（短），傍晚影子在东（长）。连接上午和下午的影子，连线大致东西，垂线大致南北。</p>
+        </div>
+        <div class="compass">
+            <h3>🧐 观察影子长短</h3>
+            <ul>
+                <li>太阳越低 → 影子越长</li>
+                <li>太阳越高 → 影子越短</li>
+                <li>正午太阳在南，影子在北且最短</li>
+                <li>上午下午影子长，方向相反</li>
+            </ul>
+            <p style="font-size:1rem; background:#fff2b5; padding:6px; border-radius:20px;">✨ 现在影子顶端都在一条水平线上（虚线已隐藏），试试标记两点，看看连线和垂线。</p>
+        </div>
+    </div>
+
+    <div class="footnote">
+        💡 <strong>三年级实验：</strong> ① 影子长短变化（早晚长、中午短）；② 连接两个标记点后自动画出<strong>南北垂线</strong>（虚线）；③ 太阳从左边（东）升起，右边（西）落下。注意观察影子方向与太阳相反。
+    </div>
+</div>
+
+<script>
+(function(){
+    const canvas = document.getElementById('skyCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // 固定参数：杆子位于画布中心 (逻辑坐标0,0)
+    const CX = 400, CY = 250;          // 画布中心
+    const R_SUN = 150;                  // 太阳轨道半径 (仅用于显示太阳位置)
+
+    // 我们希望影子顶端始终在一条水平线上 (逻辑坐标 y = HORIZONTAL_Y)
+    // 北为负，所以取负值表示北侧。例如 HORIZONTAL_Y = -70 表示在北侧70单位处
+    const HORIZONTAL_Y = -70;            // 影子顶端y坐标固定 (北侧70)
+
+    // 影子长度限制，防止超出画布
+    const MAX_SHADOW_LEN = 200;
+
+    // 方向标记存储 (逻辑坐标)
+    let mark1 = null;   // { x, y }
+    let mark2 = null;   // { x, y }
+
+    // 当前太阳角度 (度): 0° = 东 (左边), 90° = 南 (下方), 180° = 西 (右边)
+    let currentDeg = 45;  // 默认上午
+
+    // DOM元素
+    const sunSlider = document.getElementById('sunSlider');
+    const sunPosText = document.getElementById('sunPosText');
+    const coord1Span = document.getElementById('coord1');
+    const coord2Span = document.getElementById('coord2');
+    const dir12Span = document.getElementById('dir12');
+    const perpDirSpan = document.getElementById('perpDir');
+
+    // 按钮
+    const mark1Btn = document.getElementById('mark1Btn');
+    const mark2Btn = document.getElementById('mark2Btn');
+    const clearBtn = document.getElementById('clearBtn');
+    const morningBtn = document.getElementById('morningBtn');
+    const noonBtn = document.getElementById('noonBtn');
+    const afternoonBtn = document.getElementById('afternoonBtn');
+
+    // ========== 辅助函数：逻辑坐标 ←→ 画布坐标 ==========
+    function logicToCanvas(lx, ly) {
+        // 逻辑: 东(+x) , 北(-y) ; 画布: 东→右, 北→上 (y减小)
+        return { x: CX + lx, y: CY - ly };
+    }
+
+    function canvasToLogic(cx, cy) {
+        return { x: cx - CX, y: CY - cy };
+    }
+
+    // 根据角度(度)获取太阳的逻辑坐标 (新定义: 0°东(左), 90°南, 180°西(右))
+    function sunPosFromDeg(deg) {
+        const rad = deg * Math.PI / 180;
+        // 东在左边 => x = -R * cos(θ) ; 南在下 => y = +R * sin(θ)
+        return {
+            x: -R_SUN * Math.cos(rad),
+            y:  R_SUN * Math.sin(rad)
+        };
+    }
+
+    // 根据太阳角度计算影子顶点逻辑坐标 (保证顶端在 y = HORIZONTAL_Y 的水平线上)
+    function shadowVertexFromDeg(deg) {
+        const rad = deg * Math.PI / 180;
+        // 太阳方向向量: (-cosθ, sinθ)
+        // 影子方向与太阳相反: (cosθ, -sinθ)
+        const dirX = Math.cos(rad);
+        const dirY = -Math.sin(rad);
+
+        // 计算影子长度 L，使得顶端 y 坐标为 HORIZONTAL_Y
+        // 顶端 y = L * dirY = L * (-sinθ) = HORIZONTAL_Y  => L = -HORIZONTAL_Y / sinθ
+        let L = -HORIZONTAL_Y / Math.sin(rad);  // 因为 HORIZONTAL_Y 为负，sinθ>0，所以L为正
+
+        // 防止影子过长超出画布
+        if (L > MAX_SHADOW_LEN) L = MAX_SHADOW_LEN;
+        if (L < 10) L = 10; // 最短影长限制
+
+        return {
+            x: L * dirX,
+            y: L * dirY   // 应该等于 HORIZONTAL_Y (受限制后可能略有偏差)
+        };
+    }
+
+    // 根据当前滑块度数更新太阳和影子，并重绘
+    function updateFromSlider() {
+        const deg = parseInt(sunSlider.value, 10);
+        currentDeg = deg;
+        if (deg < 45) sunPosText.innerText = '🌞 东 · 上午 (长影)';
+        else if (deg < 85) sunPosText.innerText = '🌞 东南 · 上午 (较长)';
+        else if (deg < 105) sunPosText.innerText = '🌞 南 · 正午 (最短)';
+        else if (deg < 135) sunPosText.innerText = '🌞 西南 · 下午 (较长)';
+        else sunPosText.innerText = '🌞 西 · 下午 (长影)';
+        drawCanvas();
+    }
+
+    // 绘制整个场景
+    function drawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. 浅色网格
+        ctx.strokeStyle = '#c0dbc0';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= canvas.width; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.strokeStyle = '#d0e8d0';
+            ctx.stroke();
+        }
+        for (let i = 0; i <= canvas.height; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.strokeStyle = '#d0e8d0';
+            ctx.stroke();
+        }
+
+        // 2. 绘制大大的方位标 (N, S, E, W) 注意东在左，西在右
+        ctx.font = 'bold 32px "Segoe UI", "Arial", sans-serif';
+        ctx.fillStyle = '#2b4d2b';
+        // 北 (N)
+        ctx.fillText('🡑', CX-20, 45);
+        ctx.fillText('N', CX-12, 85);
+        // 南 (S)
+        ctx.fillText('🡓', CX-20, canvas.height-45);
+        ctx.fillText('S', CX-12, canvas.height-85);
+        // 东 (E) 在左侧
+        ctx.fillText('🡒', 25, CY+15);      // 右箭头指向东
+        ctx.fillText('E', 60, CY+15);
+        // 西 (W) 在右侧
+        ctx.fillText('🡐', canvas.width-75, CY+15); // 左箭头指向西
+        ctx.fillText('W', canvas.width-110, CY+15);
+
+        // 3. 绘制杆子
+        ctx.fillStyle = '#8b5a2b';
+        ctx.beginPath();
+        ctx.arc(CX, CY, 12, 0, 2*Math.PI);
+        ctx.fill();
+        ctx.fillStyle = '#5c3b1c';
+        ctx.beginPath();
+        ctx.rect(CX-6, CY-30, 12, 40);
+        ctx.fill();
+
+        // 4. 绘制太阳轨道 (半圆: 东→南→西)，只显示20°~160°范围
+        ctx.beginPath();
+        ctx.strokeStyle = '#b87c4b';
+        ctx.lineWidth = 4;
+        ctx.setLineDash([8, 8]);
+        for (let d = 20; d <= 160; d += 5) {
+            const rad = d * Math.PI / 180;
+            // 轨道点位置根据新定义计算：x = -R*cosθ, y = R*sinθ
+            const lx = -R_SUN * Math.cos(rad);
+            const ly =  R_SUN * Math.sin(rad);
+            const p = logicToCanvas(lx, ly);
+            if (d === 20) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 标注轨道上的东、南、西 (东在左，西在右)
+        ctx.font = 'bold 20px "Segoe UI"';
+        ctx.fillStyle = '#a64b2a';
+        // 东: 角度20° (左偏下)
+        const eastP = logicToCanvas(-R_SUN * Math.cos(20*Math.PI/180), R_SUN * Math.sin(20*Math.PI/180));
+        // 南: 角度90°
+        const southP = logicToCanvas(0, R_SUN);
+        // 西: 角度160° (右偏下)
+        const westP = logicToCanvas(-R_SUN * Math.cos(160*Math.PI/180), R_SUN * Math.sin(160*Math.PI/180));
+        ctx.fillText('东', eastP.x-35, eastP.y-15);
+        ctx.fillText('南', southP.x-20, southP.y+25);
+        ctx.fillText('西', westP.x+10, westP.y-15);
+
+        // 5. 绘制当前太阳
+        const sunLog = sunPosFromDeg(currentDeg);
+        const sunCanvas = logicToCanvas(sunLog.x, sunLog.y);
+        // 光线虚线
+        ctx.beginPath();
+        ctx.strokeStyle = '#f1c232';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.moveTo(sunCanvas.x, sunCanvas.y);
+        ctx.lineTo(CX, CY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // 太阳
+        ctx.shadowColor = 'gold';
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.fillStyle = '#ffaa00';
+        ctx.arc(sunCanvas.x, sunCanvas.y, 22, 0, 2*Math.PI);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText('☀️', sunCanvas.x-18, sunCanvas.y-18);
+
+        // 6. 绘制当前影子 (顶点在水平线上)
+        const shadowLog = shadowVertexFromDeg(currentDeg);
+        const shadowCanvas = logicToCanvas(shadowLog.x, shadowLog.y);
+        ctx.beginPath();
+        ctx.strokeStyle = '#4a2c0d';
+        ctx.lineWidth = 8;
+        ctx.moveTo(CX, CY);
+        ctx.lineTo(shadowCanvas.x, shadowCanvas.y);
+        ctx.stroke();
+        ctx.fillStyle = '#3c2a1e';
+        ctx.beginPath();
+        ctx.arc(shadowCanvas.x, shadowCanvas.y, 10, 0, 2*Math.PI);
+        ctx.fill();
+
+        // 7. 绘制标记1 和 标记2
+        if (mark1) {
+            const p = logicToCanvas(mark1.x, mark1.y);
+            ctx.fillStyle = '#1f4e8c';
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#0a2f44';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 16, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 22px sans-serif';
+            ctx.fillText('1', p.x-9, p.y+8);
+        }
+        if (mark2) {
+            const p = logicToCanvas(mark2.x, mark2.y);
+            ctx.fillStyle = '#2f6b2f';
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#124012';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 16, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 22px sans-serif';
+            ctx.fillText('2', p.x-9, p.y+8);
+        }
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+
+        // 8. 如果有两个标记，绘制连线 + 箭头 + 南北垂线
+        if (mark1 && mark2) {
+            const p1 = logicToCanvas(mark1.x, mark1.y);
+            const p2 = logicToCanvas(mark2.x, mark2.y);
+
+            // 绘制连线
+            ctx.beginPath();
+            ctx.strokeStyle = '#9b59b6';
+            ctx.lineWidth = 5;
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+
+            // 画箭头 (从1指向2)
+            const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+            const arrowX = p2.x - 15 * Math.cos(angle);
+            const arrowY = p2.y - 15 * Math.sin(angle);
+            ctx.fillStyle = '#6a329f';
+            ctx.beginPath();
+            ctx.moveTo(arrowX, arrowY);
+            ctx.lineTo(arrowX - 18 * Math.cos(angle - 0.4), arrowY - 18 * Math.sin(angle - 0.4));
+            ctx.lineTo(arrowX - 18 * Math.cos(angle + 0.4), arrowY - 18 * Math.sin(angle + 0.4));
+            ctx.closePath();
+            ctx.fill();
+
+            // 计算中点
+            const midX = (p1.x + p2.x) / 2;
+            const midY = (p1.y + p2.y) / 2;
+
+            // 计算垂直于连线方向的向量
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const len = Math.hypot(dx, dy);
+            if (len > 0.1) {
+                const perpX = -dy / len;
+                const perpY = dx / len;
+
+                // 垂线长度 (画布像素)
+                const perpLen = 80;
+                const end1X = midX + perpX * perpLen;
+                const end1Y = midY + perpY * perpLen;
+                const end2X = midX - perpX * perpLen;
+                const end2Y = midY - perpY * perpLen;
+
+                // 绘制垂线 (虚线)
+                ctx.beginPath();
+                ctx.strokeStyle = '#d14a8f';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([8, 6]);
+                ctx.moveTo(end1X, end1Y);
+                ctx.lineTo(end2X, end2Y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // 标注北/南
+                if (end1Y < end2Y) {
+                    ctx.fillStyle = '#b5456b';
+                    ctx.font = 'bold 20px "Segoe UI"';
+                    ctx.fillText('北', end1X-20, end1Y-10);
+                    ctx.fillText('南', end2X-20, end2Y+20);
+                } else {
+                    ctx.fillStyle = '#b5456b';
+                    ctx.font = 'bold 20px "Segoe UI"';
+                    ctx.fillText('北', end2X-20, end2Y-10);
+                    ctx.fillText('南', end1X-20, end1Y+20);
+                }
+            }
+
+            updateDirectionText();
+        } else {
+            if (!mark1) coord1Span.innerText = '——';
+            if (!mark2) coord2Span.innerText = '——';
+            dir12Span.innerText = '等待两个标记';
+            perpDirSpan.innerText = '——';
+        }
+
+        // 显示标记坐标描述
+        if (mark1) {
+            coord1Span.innerText = `影子 · ${describeDir(mark1.x, mark1.y)} (y≈${Math.round(mark1.y)})`;
+        } else coord1Span.innerText = '——';
+        if (mark2) {
+            coord2Span.innerText = `影子 · ${describeDir(mark2.x, mark2.y)} (y≈${Math.round(mark2.y)})`;
+        } else coord2Span.innerText = '——';
+    }
+
+    function describeDir(x, y) {
+        if (Math.abs(x) < 10 && Math.abs(y) < 10) return '中心';
+        const ang = Math.atan2(y, x) * 180 / Math.PI;
+        if (ang > -45 && ang <= 45) return '偏东';
+        if (ang > 45 && ang <= 135) return '偏北';
+        if (ang > 135 || ang <= -135) return '偏西';
+        return '偏南';
+    }
+
+    function updateDirectionText() {
+        if (!mark1 || !mark2) return;
+
+        const dx = mark2.x - mark1.x;
+        const dy = mark2.y - mark1.y;
+        if (Math.hypot(dx, dy) < 0.1) {
+            dir12Span.innerText = '两点重合';
+            perpDirSpan.innerText = '——';
+            return;
+        }
+
+        let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        if (angle < 0) angle += 360;
+
+        const dirStr = angleToText(angle);
+        dir12Span.innerText = `${dirStr} (${Math.round(angle)}°)`;
+
+        const perpAngle = (angle + 90) % 360;
+        const perpDirStr = angleToText(perpAngle);
+        perpDirSpan.innerText = `${perpDirStr} 或 ${angleToText((perpAngle+180)%360)}`;
+    }
+
+    function angleToText(deg) {
+        if (deg > 335 || deg <= 25) return '东';
+        if (deg > 25 && deg <= 65) return '东北';
+        if (deg > 65 && deg <= 115) return '北';
+        if (deg > 115 && deg <= 155) return '西北';
+        if (deg > 155 && deg <= 205) return '西';
+        if (deg > 205 && deg <= 245) return '西南';
+        if (deg > 245 && deg <= 295) return '南';
+        if (deg > 295 && deg <= 335) return '东南';
+        return '东';
+    }
+
+    function recordMark(which) {
+        const shadowLog = shadowVertexFromDeg(currentDeg);
+        if (which === 1) {
+            mark1 = { x: shadowLog.x, y: shadowLog.y };
+        } else {
+            mark2 = { x: shadowLog.x, y: shadowLog.y };
+        }
+        drawCanvas();
+    }
+
+    function clearMarks() {
+        mark1 = null;
+        mark2 = null;
+        drawCanvas();
+    }
+
+    // 快速定位
+    function setMorning() {
+        sunSlider.value = 25; // 东偏一点 (左)
+        updateFromSlider();
+    }
+    function setNoon() {
+        sunSlider.value = 90; // 正南
+        updateFromSlider();
+    }
+    function setAfternoon() {
+        sunSlider.value = 155; // 西偏一点 (右)
+        updateFromSlider();
+    }
+
+    // 事件绑定
+    sunSlider.addEventListener('input', updateFromSlider);
+    mark1Btn.addEventListener('click', () => recordMark(1));
+    mark2Btn.addEventListener('click', () => recordMark(2));
+    clearBtn.addEventListener('click', clearMarks);
+    morningBtn.addEventListener('click', setMorning);
+    noonBtn.addEventListener('click', setNoon);
+    afternoonBtn.addEventListener('click', setAfternoon);
+
+    // 点击canvas直接移动太阳
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mouseCanvasX = (e.clientX - rect.left) * scaleX;
+        const mouseCanvasY = (e.clientY - rect.top) * scaleY;
+        const logic = canvasToLogic(mouseCanvasX, mouseCanvasY);
+        let angle = Math.atan2(logic.y, logic.x) * 180 / Math.PI;
+        if (angle < 0) angle += 360;
+        // 限制在20-160度，且将角度映射到新定义范围 (东左:0°, 西右:180°)
+        // 注意：因为新定义下太阳位置x为负时对应小角度，需要根据点击位置计算正确角度
+        // 我们可以根据点击的逻辑坐标反推太阳角度：太阳方向向量 = (-cosθ, sinθ) 
+        // 而点击位置并不直接给出太阳角度，但我们可以通过将点击视为太阳位置来解θ
+        // 这里简单处理：将鼠标点击视为太阳可能的位置，但为了简化，我们仍然使用原来的映射方式，
+        // 但需要调整角度计算。由于太阳轨道上的点满足 x = -R cosθ, y = R sinθ，
+        // 所以 θ = atan2(y, -x) （因为 -x = R cosθ, y = R sinθ）。
+        // 所以我们用 atan2(logic.y, -logic.x) 来计算角度。
+        let correctedAngle = Math.atan2(logic.y, -logic.x) * 180 / Math.PI;
+        if (correctedAngle < 0) correctedAngle += 360;
+        // 限制在20-160
+        if (correctedAngle < 20) correctedAngle = 20;
+        if (correctedAngle > 160) correctedAngle = 160;
+        sunSlider.value = correctedAngle;
+        updateFromSlider();
+    });
+
+    // 初始化
+    updateFromSlider();
+})();
+</script>
+</body>
+</html>
