@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>🌞 太阳影子 · 东左西右（三年级模拟）</title>
     <style>
         * {
@@ -69,7 +69,7 @@
             border-radius: 30px;
             box-shadow: 0 6px 0 #3c6e1e;
             cursor: grab;
-            touch-action: none;
+            touch-action: none;  /* 禁止触摸滚动，便于拖拽 */
         }
         .control-panel {
             display: flex;
@@ -273,12 +273,12 @@
                 <li>正午太阳在南，影子在北且最短</li>
                 <li>上午下午影子长，方向相反</li>
             </ul>
-            <p style="font-size:1rem; background:#fff2b5; padding:6px; border-radius:20px;">✨ 现在影子顶端都在一条水平线上（虚线已隐藏），记录两点后点击连接按钮查看连线与垂线。</p>
+            <p style="font-size:1rem; background:#fff2b5; padding:6px; border-radius:20px;">✨ 现在影子顶端都在一条水平线上（虚线已隐藏），记录两点后点击连接按钮查看连线与垂线。手机也可拖拽太阳移动。</p>
         </div>
     </div>
 
     <div class="footnote">
-        💡 <strong>三年级实验：</strong> ① 影子长短变化（早晚长、中午短）；② 点击<strong>连接按钮</strong>后画出1→2连线及南北垂线（上南下北）；③ 太阳从左边（东）升起，右边（西）落下。可以<strong>拖动太阳图标</strong>或使用滑块调整位置。
+        💡 <strong>三年级实验：</strong> ① 影子长短变化（早晚长、中午短）；② 点击<strong>连接按钮</strong>后画出1→2连线及南北垂线（上南下北）；③ 太阳从左边（东）升起，右边（西）落下。可以<strong>拖拽太阳图标</strong>（手机也支持）或使用滑块调整位置。
     </div>
 </div>
 
@@ -633,52 +633,57 @@
     function setNoon() { sunSlider.value = 90; updateFromSlider(); }
     function setAfternoon() { sunSlider.value = 155; updateFromSlider(); }
 
-    // ========== 鼠标拖动太阳 ==========
+    // ========== 鼠标/触摸拖拽太阳 ==========
     let isDragging = false;
 
-    function handleMouseDown(e) {
+    // 统一处理坐标获取
+    function getCanvasCoordsFromEvent(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        const mouseCanvasX = (e.clientX - rect.left) * scaleX;
-        const mouseCanvasY = (e.clientY - rect.top) * scaleY;
-        const logic = canvasToLogic(mouseCanvasX, mouseCanvasY);
+        let clientX, clientY;
+        if (e.touches) {
+            // 触摸事件
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        const canvasX = (clientX - rect.left) * scaleX;
+        const canvasY = (clientY - rect.top) * scaleY;
+        return { x: canvasX, y: canvasY };
+    }
 
-        // 计算当前太阳位置
+    function startDrag(e) {
+        e.preventDefault(); // 阻止页面滚动/缩放
+        const { x, y } = getCanvasCoordsFromEvent(e);
+        const logic = canvasToLogic(x, y);
         const sunLog = sunPosFromDeg(currentDeg);
         const sunCanvas = logicToCanvas(sunLog.x, sunLog.y);
-        const dist = Math.hypot(mouseCanvasX - sunCanvas.x, mouseCanvasY - sunCanvas.y);
-
-        if (dist < 30) {  // 点击太阳附近
+        const dist = Math.hypot(x - sunCanvas.x, y - sunCanvas.y);
+        if (dist < 40) {  // 点击太阳附近
             isDragging = true;
             canvas.style.cursor = 'grabbing';
-            e.preventDefault();
         }
     }
 
-    function handleMouseMove(e) {
+    function dragMove(e) {
         if (!isDragging) return;
         e.preventDefault();
-
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const mouseCanvasX = (e.clientX - rect.left) * scaleX;
-        const mouseCanvasY = (e.clientY - rect.top) * scaleY;
-        const logic = canvasToLogic(mouseCanvasX, mouseCanvasY);
-
+        const { x, y } = getCanvasCoordsFromEvent(e);
+        const logic = canvasToLogic(x, y);
         // 根据鼠标位置计算角度：太阳在轨道上满足 x = -R cosθ, y = R sinθ
         // 所以 θ = atan2(y, -x)
         let angle = Math.atan2(logic.y, -logic.x) * 180 / Math.PI;
         if (angle < 0) angle += 360;
-        // 限制在20~160度
         if (angle < 20) angle = 20;
         if (angle > 160) angle = 160;
         sunSlider.value = angle;
         updateFromSlider();
     }
 
-    function handleMouseUp(e) {
+    function stopDrag(e) {
         if (isDragging) {
             isDragging = false;
             canvas.style.cursor = 'grab';
@@ -686,7 +691,31 @@
         }
     }
 
-    // 事件绑定
+    // 鼠标事件
+    canvas.addEventListener('mousedown', startDrag);
+    window.addEventListener('mousemove', dragMove);
+    window.addEventListener('mouseup', stopDrag);
+
+    // 触摸事件 (移动端)
+    canvas.addEventListener('touchstart', startDrag, { passive: false });
+    window.addEventListener('touchmove', dragMove, { passive: false });
+    window.addEventListener('touchend', stopDrag);
+    window.addEventListener('touchcancel', stopDrag);
+
+    // 原有的点击画布移动太阳保留（在非拖拽时触发）
+    canvas.addEventListener('click', (e) => {
+        if (isDragging) return; // 拖拽时不处理点击
+        const { x, y } = getCanvasCoordsFromEvent(e);
+        const logic = canvasToLogic(x, y);
+        let angle = Math.atan2(logic.y, -logic.x) * 180 / Math.PI;
+        if (angle < 0) angle += 360;
+        if (angle < 20) angle = 20;
+        if (angle > 160) angle = 160;
+        sunSlider.value = angle;
+        updateFromSlider();
+    });
+
+    // 事件绑定（按钮等）
     sunSlider.addEventListener('input', updateFromSlider);
     mark1Btn.addEventListener('click', () => recordMark(1));
     mark2Btn.addEventListener('click', () => recordMark(2));
@@ -695,29 +724,6 @@
     morningBtn.addEventListener('click', setMorning);
     noonBtn.addEventListener('click', setNoon);
     afternoonBtn.addEventListener('click', setAfternoon);
-
-    // 拖拽事件
-    canvas.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    // 原有的点击画布移动太阳保留，但可能会和拖拽冲突，我们将其改为仅当没有拖拽时触发？
-    // 为了简化，保留点击跳转功能，但用户在拖拽时不会触发点击。
-    canvas.addEventListener('click', (e) => {
-        if (isDragging) return; // 拖拽时不处理点击
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const mouseCanvasX = (e.clientX - rect.left) * scaleX;
-        const mouseCanvasY = (e.clientY - rect.top) * scaleY;
-        const logic = canvasToLogic(mouseCanvasX, mouseCanvasY);
-        let angle = Math.atan2(logic.y, -logic.x) * 180 / Math.PI;
-        if (angle < 0) angle += 360;
-        if (angle < 20) angle = 20;
-        if (angle > 160) angle = 160;
-        sunSlider.value = angle;
-        updateFromSlider();
-    });
 
     // 初始化
     updateFromSlider();
